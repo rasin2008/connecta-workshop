@@ -1,26 +1,397 @@
-@import "tailwindcss";
+/* CONNECTA BLUE THEME */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+--connecta-blue: #1746A2;
+--connecta-navy: #07152F;
+--connecta-light: #EAF2FF;
+--connecta-white: #FFFFFF;
+--connecta-text: #17233B;
+--connecta-border: #D6E1F2;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+* {
+  box-sizing: border-box;
   }
-}
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+margin: 0;
+font-family: Arial, Helvetica, sans-serif;
+background: var(--connecta-white);
+color: var(--connecta-text);
+}
+
+.registration-page {
+min-height: 100vh;
+background: linear-gradient(180deg, #F5F8FF, #FFFFFF);
+}
+
+.topbar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 20px 7%;
+background: var(--connecta-navy);
+color: white;
+gap: 20px;
+}
+
+.brand,
+.footer-brand {
+display: flex;
+align-items: center;
+gap: 14px;
+color: white;
+text-decoration: none;
+font-weight: 800;
+}
+
+.brand-name {
+font-size: 25px;
+letter-spacing: 2px;
+}
+
+.connecta-logo {
+width: 58px;
+height: 58px;
+object-fit: contain;
+}
+
+.topbar-right {
+display: flex;
+align-items: center;
+gap: 14px;
+}
+
+.ksum-logo {
+width: 48px;
+height: 48px;
+object-fit: contain;
+}
+
+.topbar-label {
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 1px;
+}
+
+.hero {
+padding: 75px 8% 65px;
+background: radial-gradient(
+circle at 90% 10%,
+#D6E5FF,
+transparent 40%
+);
+}
+
+.hero-badge,
+.section-label {
+color: var(--connecta-blue);
+font-size: 12px;
+font-weight: 800;
+letter-spacing: 1.5px;
+}
+
+.live-dot {
+display: inline-block;
+width: 8px;
+height: 8px;
+margin-right: 8px;
+border-radius: 50%;
+background: #16A36A;
+}
+
+.hero h1 {
+margin: 24px 0 18px;
+color: var(--connecta-navy);
+font-size: clamp(38px, 6vw, 66px);
+line-height: 1.1;
+letter-spacing: -2px;
+}
+
+.hero h1 span {
+color: var(--connecta-blue);
+}
+
+.hero > p {
+max-width: 650px;
+color: #52627D;
+font-size: 17px;
+line-height: 1.8;
+}
+
+.hero-details {
+display: flex;
+flex-wrap: wrap;
+gap: 24px;
+margin-top: 30px;
+}
+
+.detail-item {
+display: flex;
+align-items: center;
+gap: 9px;
+font-size: 14px;
+font-weight: 600;
+}
+
+.detail-icon {
+color: var(--connecta-blue);
+font-size: 20px;
+}
+
+.form-section {
+max-width: 920px;
+margin: 0 auto;
+padding: 45px 24px 75px;
+}
+
+.form-heading {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 30px;
+}
+
+.form-heading h2 {
+margin: 12px 0;
+color: var(--connecta-navy);
+font-size: clamp(26px, 4vw, 34px);
+}
+
+.form-heading p {
+color: #64748B;
+}
+
+.form-number {
+color: var(--connecta-blue);
+font-size: 13px;
+font-weight: 800;
+white-space: nowrap;
+}
+
+.form-section form,
+.success-message {
+padding: 32px;
+border: 1px solid var(--connecta-border);
+border-radius: 20px;
+background: white;
+box-shadow: 0 15px 45px rgba(7, 21, 47, 0.07);
+}
+
+.form-grid {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 23px;
+}
+
+.field {
+display: flex;
+flex-direction: column;
+gap: 9px;
+min-width: 0;
+}
+
+.field label {
+color: var(--connecta-navy);
+font-size: 14px;
+font-weight: 700;
+}
+
+.field input,
+.field select {
+width: 100%;
+min-height: 48px;
+padding: 12px 14px;
+border: 1px solid var(--connecta-border);
+border-radius: 9px;
+background: #FCFDFF;
+color: var(--connecta-text);
+font: inherit;
+outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+border-color: var(--connecta-blue);
+box-shadow: 0 0 0 3px rgba(23, 70, 162, 0.12);
+}
+
+.full-width {
+grid-column: 1 / -1;
+}
+
+.consent {
+display: flex;
+align-items: flex-start;
+gap: 11px;
+margin: 25px 0;
+color: #52627D;
+font-size: 13px;
+line-height: 1.7;
+}
+
+.consent input {
+margin-top: 4px;
+accent-color: var(--connecta-blue);
+}
+
+.submit-button {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+min-height: 49px;
+padding: 0 24px;
+border: 0;
+border-radius: 9px;
+background: var(--connecta-blue);
+color: white;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+transition: background 0.2s, transform 0.2s;
+}
+
+.submit-button:hover {
+background: var(--connecta-navy);
+transform: translateY(-1px);
+}
+
+.privacy-note {
+margin: 20px 0 0;
+color: #64748B;
+font-size: 12px;
+line-height: 1.7;
+}
+
+.success-message {
+text-align: center;
+}
+
+.success-icon {
+display: grid;
+place-items: center;
+width: 56px;
+height: 56px;
+margin: 0 auto 18px;
+border-radius: 50%;
+background: var(--connecta-light);
+color: var(--connecta-blue);
+font-size: 28px;
+}
+
+.success-message h3 {
+color: var(--connecta-navy);
+}
+
+.success-message p {
+margin-bottom: 24px;
+line-height: 1.7;
+color: #52627D;
+}
+
+.footer {
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap;
+gap: 22px;
+padding: 30px 7%;
+background: var(--connecta-navy);
+color: white;
+font-size: 13px;
+}
+
+.footer-brand-section {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.footer-brand {
+font-size: 18px;
+letter-spacing: 1px;
+}
+
+.founder-name {
+color: #B9C9E8;
+}
+
+@media (max-width: 600px) {
+.topbar {
+padding: 16px 5%;
+gap: 10px;
+}
+
+.brand {
+gap: 8px;
+}
+
+.brand-name {
+font-size: 17px;
+letter-spacing: 1px;
+}
+
+.connecta-logo {
+width: 42px;
+height: 42px;
+}
+
+.ksum-logo {
+width: 32px;
+height: 32px;
+}
+
+.topbar-label {
+font-size: 10px;
+}
+
+.topbar-right {
+gap: 8px;
+}
+
+.hero {
+padding: 52px 6% 45px;
+}
+
+.hero h1 {
+letter-spacing: -1px;
+}
+
+.hero-details {
+gap: 14px;
+}
+
+.form-section {
+padding: 35px 16px 50px;
+}
+
+.form-heading {
+flex-direction: column;
+}
+
+.form-section form,
+.success-message {
+padding: 22px 17px;
+}
+
+.form-grid {
+grid-template-columns: 1fr;
+gap: 19px;
+}
+
+.full-width {
+grid-column: auto;
+}
+
+.submit-button {
+width: 100%;
+}
+
+.footer {
+flex-direction: column;
+align-items: flex-start;
+padding: 28px 6%;
+}
 }
