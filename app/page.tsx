@@ -1,65 +1,88 @@
+
 "use client";
 
 import { useState } from "react";
+import { MapPin } from "lucide-react";
 
 export default function Home() {
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const form = e.currentTarget;
+    if (saving) return;
+
+    setSaving(true);
+    setErrorMessage("");
+
+    const form = event.currentTarget;
     const formData = new FormData(form);
 
     const registration = {
-      fullName: formData.get("fullName"),
-      age: formData.get("age"),
-      gender: formData.get("gender"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      college: formData.get("college"),
-      workshop: formData.get("workshop"),
-      consent: formData.get("consent"),
-      registeredAt: new Date().toISOString(),
+      fullName: String(formData.get("fullName") || "").trim(),
+      age: Number(formData.get("age")),
+      gender: String(formData.get("gender") || ""),
+      email: String(formData.get("email") || "").trim(),
+      phone: String(formData.get("phone") || "").trim(),
+      college: String(formData.get("college") || "").trim(),
+      workshopSession: String(formData.get("workshopSession") || ""),
+      consent: formData.get("consent") === "on",
     };
 
     try {
-      const existing = JSON.parse(
-        localStorage.getItem("connectaWorkshopRegistrations") || "[]"
-      );
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registration),
+      });
 
-      if (!Array.isArray(existing)) {
-        throw new Error("Invalid registration data");
+      const responseText = await response.text();
+
+      let result: {
+        success?: boolean;
+        message?: string;
+        registrationId?: string;
+      };
+
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        throw new Error(
+          `Server returned an invalid response (HTTP ${response.status}). Check the VS Code terminal.`
+        );
       }
 
-      existing.push(registration);
-
-      localStorage.setItem(
-        "connectaWorkshopRegistrations",
-        JSON.stringify(existing)
-      );
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Registration failed. Please try again."
+        );
+      }
 
       setSubmitted(true);
       form.reset();
-    } catch {
-      alert("Registration save cheyyan kazhinjilla. Veendum try cheyyuka.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setSaving(false);
     }
   }
 
   return (
     <main className="registration-page">
-      {/* HEADER - BOTH LOGOS AND NAMES */}
       <header className="topbar">
         <a href="/" className="brand">
           <img
             src="/connecta-logo.png"
-            alt="CONNECTA Logo"
+            alt="CONNECTA logo"
             className="connecta-logo"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
           />
-
           <span className="brand-name">CONNECTA</span>
         </a>
 
@@ -67,23 +90,22 @@ export default function Home() {
           <div className="ksum-brand">
             <img
               src="/ksum-logo.png"
-              alt="Kerala Startup Mission Logo"
+              alt="Kerala Startup Mission logo"
               className="ksum-logo"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
             />
-
-            <span className="ksum-name">
-              Kerala Startup Mission
-            </span>
+            <div className="ksum-name">
+              <strong>Kerala Startup Mission</strong>
+              <span>Government of Kerala</span>
+            </div>
           </div>
 
-          <span className="topbar-label">WORKSHOP 2026</span>
+          <div className="location-bar">
+            <MapPin size={17} aria-hidden="true" />
+            <span>Near Government Cyberpark, Kozhikode</span>
+          </div>
         </div>
       </header>
 
-      {/* HERO SECTION */}
       <section className="hero">
         <div className="hero-badge">
           <span className="live-dot" />
@@ -97,8 +119,8 @@ export default function Home() {
         </h1>
 
         <p>
-          Join the CONNECTA Workshop and discover new skills,
-          meet inspiring people, and build your future.
+          Be part of the CONNECTA workshop. Meet new people, learn useful
+          skills, and explore opportunities for your future.
         </p>
 
         <div className="hero-details">
@@ -108,206 +130,194 @@ export default function Home() {
           </div>
 
           <div className="detail-item">
-            <span className="detail-icon">↗</span>
+            <span className="detail-icon">◎</span>
             <span>Networking</span>
           </div>
 
           <div className="detail-item">
-            <span className="detail-icon">◎</span>
+            <span className="detail-icon">↗</span>
             <span>New Opportunities</span>
           </div>
         </div>
       </section>
 
-      {/* REGISTRATION FORM */}
       <section className="form-section">
-        <div className="form-heading">
-          <div>
-            <span className="section-label">
-              YOUR NEXT CHAPTER STARTS HERE
-            </span>
-
-            <h2>Workshop Registration</h2>
-
-            <p>Fill in your details to reserve your spot.</p>
-          </div>
-
-          <div className="form-number">01 / 01</div>
-        </div>
-
         {submitted ? (
           <div className="success-message">
             <div className="success-icon">✓</div>
-
-            <h3>Thank you for registering!</h3>
-
+            <span className="section-label">REGISTRATION COMPLETE</span>
+            <h2>Thank you for registering!</h2>
             <p>
-              Your registration has been saved in this browser.
-              This demo does not yet send your registration to a server.
+              Your CONNECTA Workshop registration has been saved successfully.
             </p>
-
             <button
               type="button"
               className="submit-button"
-              onClick={() => setSubmitted(false)}
+              onClick={() => {
+                setSubmitted(false);
+                setErrorMessage("");
+              }}
             >
               Register Another Person →
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <div className="field">
-                <label htmlFor="fullName">Full Name *</label>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  autoComplete="name"
-                  required
-                />
+          <>
+            <div className="form-heading">
+              <div>
+                <span className="section-label">
+                  YOUR NEXT CHAPTER STARTS HERE
+                </span>
+                <h2>Workshop Registration</h2>
+                <p>Fill in your details to reserve your spot.</p>
               </div>
 
-              <div className="field">
-                <label htmlFor="age">Age *</label>
-                <input
-                  id="age"
-                  name="age"
-                  type="number"
-                  placeholder="Enter your age"
-                  min="1"
-                  max="120"
-                  required
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="gender">Gender *</label>
-                <select
-                  id="gender"
-                  name="gender"
-                  defaultValue=""
-                  required
-                >
-                  <option value="" disabled>
-                    Select gender
-                  </option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="Prefer not to say">
-                    Prefer not to say
-                  </option>
-                </select>
-              </div>
-
-              <div className="field">
-                <label htmlFor="email">Email Address *</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="phone">Phone Number *</label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="Enter phone number"
-                  autoComplete="tel"
-                  pattern="[0-9+() -]{7,20}"
-                  required
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="college">
-                  College / Institution *
-                </label>
-                <input
-                  id="college"
-                  name="college"
-                  type="text"
-                  placeholder="Enter college name"
-                  required
-                />
-              </div>
-
-              <div className="field full-width">
-                <label htmlFor="workshop">Workshop Session *</label>
-                <select
-                  id="workshop"
-                  name="workshop"
-                  defaultValue=""
-                  required
-                >
-                  <option value="" disabled>
-                    Select a workshop
-                  </option>
-                  <option value="Web Development">
-                    Web Development
-                  </option>
-                  <option value="AI and Technology">
-                    AI &amp; Technology
-                  </option>
-                  <option value="Entrepreneurship">
-                    Entrepreneurship
-                  </option>
-                  <option value="Career Development">
-                    Career Development
-                  </option>
-                </select>
-              </div>
+              <span className="form-number">01 / 01</span>
             </div>
 
-            <label className="consent">
-              <input
-                type="checkbox"
-                name="consent"
-                value="yes"
-                required
-              />
+            <form onSubmit={handleSubmit} className="registration-form">
+              <div className="form-grid">
+                <div className="field full-width">
+                  <label htmlFor="fullName">Full Name *</label>
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    autoComplete="name"
+                    maxLength={100}
+                    required
+                  />
+                </div>
 
-              <span>
-                I confirm that the information provided is correct
-                and agree to be contacted regarding this workshop.
-              </span>
-            </label>
+                <div className="field">
+                  <label htmlFor="age">Age *</label>
+                  <input
+                    id="age"
+                    name="age"
+                    type="number"
+                    placeholder="Enter your age"
+                    min={1}
+                    max={120}
+                    required
+                  />
+                </div>
 
-            <button type="submit" className="submit-button">
-              Complete Registration <span>→</span>
-            </button>
+                <div className="field">
+                  <label htmlFor="gender">Gender *</label>
+                  <select id="gender" name="gender" defaultValue="" required>
+                    <option value="" disabled>
+                      Select gender
+                    </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">
+                      Prefer not to say
+                    </option>
+                  </select>
+                </div>
 
-            <p className="privacy-note">
-              Your information should be handled securely and only
-              used for workshop registration.
-            </p>
-          </form>
+                <div className="field">
+                  <label htmlFor="email">Email Address *</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    maxLength={254}
+                    required
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    autoComplete="tel"
+                    maxLength={20}
+                    required
+                  />
+                </div>
+
+                <div className="field full-width">
+                  <label htmlFor="college">College / Institution *</label>
+                  <input
+                    id="college"
+                    name="college"
+                    type="text"
+                    placeholder="Enter your college or institution"
+                    maxLength={150}
+                    required
+                  />
+                </div>
+
+                <div className="field full-width">
+                  <label htmlFor="workshopSession">Workshop Session *</label>
+                  <select
+                    id="workshopSession"
+                    name="workshopSession"
+                    defaultValue=""
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a workshop
+                    </option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="AI and Technology">
+                      AI &amp; Technology
+                    </option>
+                    <option value="Entrepreneurship">Entrepreneurship</option>
+                    <option value="Career Development">
+                      Career Development
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <label className="consent">
+                <input type="checkbox" name="consent" required />
+                <span>
+                  I confirm that the information provided above is accurate
+                  and agree to be contacted regarding the CONNECTA workshop.
+                </span>
+              </label>
+
+              {errorMessage && (
+                <p className="error-message" role="alert">
+                  {errorMessage}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={saving}
+              >
+                {saving ? "Submitting..." : "Complete Registration →"}
+              </button>
+
+              <p className="privacy-note">
+                Your information will be used for workshop registration and
+                related communication.
+              </p>
+            </form>
+          </>
         )}
       </section>
 
-      {/* FOOTER */}
       <footer className="footer">
         <div className="footer-brand-section">
-          <a href="/" className="footer-brand">
-            CONNECTA
-          </a>
-
-          <span className="founder-name">
-            Founder: Muhammed Ajmal
-          </span>
+          <span className="footer-brand">CONNECTA</span>
+          <span className="founder-name">Founder: Muhammed Ajmal</span>
         </div>
 
-        <span>Connecting people. Creating opportunities.</span>
-
-        <span>© 2026 CONNECTA</span>
+        <p>Connecting people. Creating opportunities.</p>
+        <span className="copyright">© 2026 CONNECTA</span>
       </footer>
     </main>
   );
